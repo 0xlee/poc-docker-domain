@@ -54,12 +54,16 @@ func handleDnsRequest(w dns.ResponseWriter, r *dns.Msg) {
 			switch q.Qtype {
 			// Only handle A records. Other records are not handled.
 			case dns.TypeA:
-				records := queryDockerContainers()
-				ips := records[q.Name]
-				for _, ip := range ips {
-					rr, err := dns.NewRR(fmt.Sprintf("%s A %s\n", q.Name, ip))
-					if err == nil {
-						m.Answer = append(m.Answer, rr)
+				records, err := queryDockerContainers()
+				if err != nil {
+					log.Println(err)
+				} else {
+					ips := records[q.Name]
+					for _, ip := range ips {
+						rr, err := dns.NewRR(fmt.Sprintf("%s A %s\n", q.Name, ip))
+						if err == nil {
+							m.Answer = append(m.Answer, rr)
+						}
 					}
 				}
 			}
@@ -84,20 +88,20 @@ type Container struct {
 
 // Queries container and network names and build a map from domain name to ip addresses.
 // Didn't optimize for performance.
-func queryDockerContainers() map[string][]string {
+func queryDockerContainers() (map[string][]string, error) {
 	resp, err := httpClient.Get("http://localhost/containers/json")
 	if err != nil {
-		log.Fatal(err)
+		return nil, fmt.Errorf("Error getting response: %w", err)
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatal(err)
+		return nil, fmt.Errorf("Error reading response body: %w", err)
 	}
 
 	var containers []Container
 	err = json.Unmarshal(body, &containers)
 	if err != nil {
-		log.Fatal(err)
+		return nil, fmt.Errorf("Error unmarshalling json response: %w", err)
 	}
 
 	result := map[string][]string{}
@@ -120,7 +124,7 @@ func queryDockerContainers() map[string][]string {
 			}
 		}
 	}
-	return result
+	return result, nil
 }
 
 // Network names with suffix _default are trimmed.
