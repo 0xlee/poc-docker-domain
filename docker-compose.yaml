@@ -1,0 +1,8 @@
+services:
+  dns-server:
+    build: .
+    ports:
+      - 5354:5354/udp
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: always
