@@ -39,6 +39,8 @@ There is a `docker-compose.yaml` file in this repository. Clone and start with
 $ docker compose up -d
 ```
 
+It starts a dns server on host port 5354 with volume `/var/run/docker.sock`, in order to access docker information.
+
 If started without any problem, you can see a docker network with name `poc-docker-domain_default` and docker container with name `dns-server`.
 
 Therefore the docker domain should be `dns-server.poc-docker-domain.docker`. You can test it with
