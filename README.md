@@ -39,7 +39,9 @@ Start the service with
 $ docker compose up -d
 ```
 
-If started with no problem, you can test it with
+If started without any problem, you can see a docker network with name `poc-docker-domain_default` and docker container with name `dns-server`.
+
+Therefore the docker domain should be `dns-server.poc-docker-domain.docker`. You can test it with
 
 ```
 $ resolvectl query dns-server.poc-docker-domain.docker
@@ -58,7 +60,7 @@ $ getent hosts dns-server.poc-docker-domain.docker
 ```
 
 Note that network lookup commands like `host`, `dig`, `nslookup` and `drill` doesn't work.
-because they don't use dns resolver .
+It's because they don't resolve dns over NSS (Name Server Switch).
 
 ## Reference
 
