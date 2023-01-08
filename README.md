@@ -33,7 +33,7 @@ DNSSEC=false
 Domains=~docker.
 ```
 
-Start the service with
+There is a `docker-compose.yaml` file in this repository. Clone and start with
 
 ```
 $ docker compose up -d
