@@ -12,7 +12,11 @@ and a docker container with name `mycontainer` in the network `mynetwork` should
 
 ## Configuration
 
+### systemd-resolved
+
 Make sure systemd-resolved is enabled/started.
+
+### nsswitch.conf
 
 Configure file `/etc/nsswitch.conf` properly:
 
@@ -22,6 +26,8 @@ hosts: mymachines mdns4_minimal [NOTFOUND=return] resolve [!UNAVAIL=return] file
 ```
 
 Make sure `resolve [!UNAVAIL=return]` exist before `dns`.
+
+### resolved config file
 
 Place a conf file to directory `/etc/systemd/resolved.conf.d/` like following:
 
@@ -33,6 +39,10 @@ DNSSEC=false
 Domains=~docker.
 ```
 
+Make sure to restart systemd-resolved after you put or update this file.
+
+### Start docker service
+
 There is a `docker-compose.yaml` file in this repository. Clone and start with
 
 ```
@@ -40,6 +50,8 @@ $ docker compose up -d
 ```
 
 It starts a dns server on host port 5354 with volume `/var/run/docker.sock`, in order to access docker information.
+
+### Test it
 
 If started without any problem, you can see a docker network with name `poc-docker-domain_default` and docker container with name `dns-server`.
 
@@ -60,6 +72,8 @@ or
 $ getent hosts dns-server.poc-docker-domain.docker
 172.20.0.2      dns-server.poc-docker-domain.docker
 ```
+
+### Note
 
 Note that network lookup commands like `host`, `dig`, `nslookup` and `drill` doesn't work.
 It's because they don't resolve dns over NSS (Name Server Switch).
